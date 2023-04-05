@@ -1,7 +1,7 @@
-// I want a named export react typescript component called ChatGPT that draws the bitcoin price for the last 5 years. The typescript must not have any implicit anys. Use only useReducer.
+// I want a named export react typescript component called ChatGPT that draws the bitcoin price for the last 5 years. The typescript must not have any implicit anys. Use only useReducer. Catch params must have the correct error type.
 
 import React, { useEffect, useReducer } from 'react';
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface PriceData {
@@ -9,12 +9,12 @@ interface PriceData {
   price: number;
 }
 
-type Action = { type: 'FETCH_SUCCESS'; payload: PriceData[] } | { type: 'FETCH_FAILURE'; error: Error };
+type Action = { type: 'FETCH_SUCCESS'; payload: PriceData[] } | { type: 'FETCH_FAILURE'; error: AxiosError };
 
 type State = {
   loading: boolean;
   priceData: PriceData[];
-  error: Error | null;
+  error: AxiosError | null;
 };
 
 const initialState: State = {
@@ -49,7 +49,7 @@ export const ChatGPT: React.FC = () => {
     const fetchPriceData = async (): Promise<void> => {
       try {
         const response: AxiosResponse<{ bpi: Record<string, number> }> = await axios.get(
-          'https://api.coindesk.com/v1/bpi/historical/close.json?start=2016-04-01&end=2021-04-01'
+          'https://api.coindesk.com/v1/bpi/historical/close.json?start=2016-04-01&end=2021-04-01&error=true'
         );
         const data: Record<string, number> = response.data.bpi;
         const formattedData: PriceData[] = Object.keys(data).map((date: string) => ({
@@ -57,7 +57,7 @@ export const ChatGPT: React.FC = () => {
           price: data[date],
         }));
         dispatch({ type: 'FETCH_SUCCESS', payload: formattedData });
-      } catch (error) {
+      } catch (error: AxiosError) {
         dispatch({ type: 'FETCH_FAILURE', error });
       }
     };
