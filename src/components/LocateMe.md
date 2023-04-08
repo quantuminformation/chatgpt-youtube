@@ -1,0 +1,1 @@
+Create a TSX React component called LocateMe.tsx that uses the getGeoLocation function (stored in ../lib) to display the user's location in a Google map. The API key is using the vite import.meta to load the VITE_GOOGLE_MAPS_API_KEY.

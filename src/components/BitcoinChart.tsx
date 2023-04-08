@@ -1,5 +1,3 @@
-// I want a named export react typescript component called ChatGPT that draws the bitcoin price for the last 5 years. The typescript must not have any implicit anys. Use only useReducer.
-
 import React, { useEffect, useReducer } from 'react';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -42,7 +40,7 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
-export const ChatGPT: React.FC = () => {
+const BitcoinChart: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
@@ -57,7 +55,7 @@ export const ChatGPT: React.FC = () => {
           price: data[date],
         }));
         dispatch({ type: 'FETCH_SUCCESS', payload: formattedData });
-      } catch (error: AxiosError) {
+      } catch (error: any) {
         dispatch({ type: 'FETCH_FAILURE', error });
       }
     };
@@ -90,3 +88,5 @@ export const ChatGPT: React.FC = () => {
     </div>
   );
 };
+
+export default BitcoinChart;

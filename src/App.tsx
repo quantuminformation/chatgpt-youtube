@@ -2,7 +2,6 @@ import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
 
 const LocateMe = lazy(() => import('./components/LocateMe'));
-const LocateMe2 = lazy(() => import('./components/LocateMe2'));
 
 const App: React.FC = () => {
   return (
@@ -11,13 +10,8 @@ const App: React.FC = () => {
           <nav style={{ width: '20%' }}>
             <ul>
               <li>
-                <NavLink to="/locateme" activeClassName="active">
+                <NavLink to="/locateme" className="active">
                   Locate Me
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/locateme2" activeClassName="active">
-                  Locate Me 2
                 </NavLink>
               </li>
             </ul>
@@ -26,7 +20,6 @@ const App: React.FC = () => {
             <Suspense fallback={<div>Loading...</div>}>
               <Routes>
                 <Route path="/locateme" element={<LocateMe />} />
-                <Route path="/locateme2" element={<LocateMe2 />} />
               </Routes>
             </Suspense>
           </div>
