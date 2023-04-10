@@ -16,4 +16,7 @@ export default defineConfig({
     threads: false,
     isolate: false,
   },
+  server: {
+    port: 4999,
+  },
 });
