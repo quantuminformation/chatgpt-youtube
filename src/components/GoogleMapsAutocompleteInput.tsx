@@ -1,45 +1,54 @@
-import { useState, useEffect } from "react";
-import { getGeoLocation } from "../lib/geoLocation";
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
+import { LoadScript, GoogleMap, Autocomplete } from "@react-google-maps/api";
 
-declare global {
-    interface Window {
-        initMap: () => void;
-    }
+interface GoogleMapsAutocompleteInputProps {
+    apiKey: string;
+    onPlaceSelect: (place: google.maps.places.PlaceResult) => void;
 }
 
-const LocateMe = () => {
-    const [map, setMap] = useState<google.maps.Map>();
+const GoogleMapsAutocompleteInput = ({
+                                         apiKey,
+                                         onPlaceSelect,
+                                     }: GoogleMapsAutocompleteInputProps) => {
+    const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete>();
+    const [inputValue, setInputValue] = useState("");
 
-    useEffect(() => {
-        const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_API_KEY_GOOGLE_MAPS}&callback=initMap`;
-        script.async = true;
-        script.defer = true;
-        document.body.appendChild(script);
+    const onLoad = (autocomplete: google.maps.places.Autocomplete) => {
+        setAutocomplete(autocomplete);
+    };
 
-        window.initMap = () => {
-            getGeoLocation(true).then(({ latitude, longitude }) => {
-                const map = new google.maps.Map(document.getElementById("map")!, {
-                    center: { lat: latitude, lng: longitude },
-                    zoom: 8,
-                });
+    const onPlaceChanged = () => {
+        const place = autocomplete?.getPlace();
+        onPlaceSelect(place);
+    };
 
-                const marker = new google.maps.Marker({
-                    position: { lat: latitude, lng: longitude },
-                    map,
-                });
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(e.target.value);
+    };
 
-                setMap(map);
-            });
-        };
-
-        return () => {
-            delete window.initMap;
-            document.body.removeChild(script);
-        };
-    }, []);
-
-    return <div id="map" style={{ height: "100vh" }} />;
+    return (
+        <LoadScript googleMapsApiKey={apiKey}>
+            <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
+                <input
+                    type="text"
+                    placeholder="Enter a location"
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    list="places"
+                />
+                <datalist id="places">
+                    {inputValue &&
+                        autocomplete &&
+                        autocomplete.getPlacePredictions({ input: inputValue }, (predictions) =>
+                            predictions.map((prediction) => (
+                                <option key={prediction.id} value={prediction.description} />
+                            ))
+                        )}
+                </datalist>
+            </Autocomplete>
+        </LoadScript>
+    );
 };
 
-export default LocateMe;
+export default GoogleMapsAutocompleteInput;
