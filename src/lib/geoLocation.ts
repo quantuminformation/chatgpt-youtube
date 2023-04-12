@@ -31,3 +31,4 @@ export async function getGeoLocation(privacy: boolean): Promise<{ latitude: numb
 
   return { latitude, longitude };
 }
+//    const data = await get('https://extreme-ip-lookup.com/json/?key=JFWsmUXpAOxHGzkt9AAW');

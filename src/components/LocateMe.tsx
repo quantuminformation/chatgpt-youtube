@@ -1,45 +1,69 @@
-import { useState, useEffect } from "react";
-import { getGeoLocation } from "../lib/geoLocation";
+import { useState, useEffect } from 'react';
+import { Loader } from '@googlemaps/js-api-loader';
+import { getGeoLocation } from '../lib/geoLocation';
 
-declare global {
-    interface Window {
-        initMap: () => void;
-    }
-}
+type Location = {
+  latitude: number;
+  longitude: number;
+};
 
 const LocateMe = () => {
-    const [map, setMap] = useState<google.maps.Map>();
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [location, setLocation] = useState<Location | null>(null);
 
-    useEffect(() => {
-        const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_API_KEY_GOOGLE_MAPS}&callback=initMap`;
-        script.async = true;
-        script.defer = true;
-        document.body.appendChild(script);
+  useEffect(() => {
+    const loader = new Loader({
+      apiKey: import.meta.env.VITE_API_KEY_GOOGLE_MAPS,
+      version: 'weekly',
+      libraries: ['places'],
+    });
 
-        window.initMap = () => {
-            getGeoLocation(true).then(({ latitude, longitude }) => {
-                const map = new google.maps.Map(document.getElementById("map")!, {
-                    center: { lat: latitude, lng: longitude },
-                    zoom: 8,
-                });
+    loader.load().then(() => {
+      const mapOptions: google.maps.MapOptions = {
+        center: new google.maps.LatLng(0, 0),
+        zoom: 8,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+      };
 
-                const marker = new google.maps.Marker({
-                    position: { lat: latitude, lng: longitude },
-                    map,
-                });
+      const mapElement = document.getElementById('map');
 
-                setMap(map);
-            });
-        };
+      if (mapElement) {
+        const map = new google.maps.Map(mapElement, mapOptions);
+        setMap(map);
+      }
+    });
+  }, []);
 
-        return () => {
-            delete window.initMap;
-            document.body.removeChild(script);
-        };
-    }, []);
+  useEffect(() => {
+    if (map && location) {
+      const { latitude, longitude } = location;
+      const center = new google.maps.LatLng(latitude, longitude);
+      map.setCenter(center);
 
-    return <div id="map" style={{ height: "100vh" }} />;
+      new google.maps.Marker({
+        position: center,
+        map: map,
+      });
+    }
+  }, [map, location]);
+
+  useEffect(() => {
+    getGeoLocation(true).then((location) => {
+      setLocation(location);
+    });
+  }, []);
+
+  return (
+    <div id="map" style={{ height: '100vh', width: '100%' }}>
+      {map && (
+        <div>
+          <h2>Your Location</h2>
+          <p>Latitude: {location?.latitude}</p>
+          <p>Longitude: {location?.longitude}</p>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default LocateMe;

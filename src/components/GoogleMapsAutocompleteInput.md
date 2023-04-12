@@ -1,0 +1,1 @@
+Create a named export input component called GoogleMapsAutocompleteInput.tsx that uses the Google Maps API to populate the inputs datalist with matches to the user's input.
