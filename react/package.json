@@ -39,5 +39,10 @@
     "jsdom": "^21.1.1",
     "typescript": "^5.0.4",
     "vite": "^4.2.1"
-  }
+  },
+  "description": "You can find the playlist here: https://www.youtube.com/playlist?list=PLualcIC6WNK0rdGgYSf-pV6OopVEG3Atw",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
